@@ -5,24 +5,39 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-    public static void main(String[] args) {
-        ExecutorService pool = Executors.newCachedThreadPool();
-        int counter = 0;
-        try (ServerSocket welcomingSocket = new ServerSocket(5757)) {
-            System.out.println("Server created");
-            while (counter<1000) {
-                Socket connectionSocket = welcomingSocket.accept();
-                counter++;
-                System.out.println("client accepted!");
-                pool.execute(new ClientHandler(connectionSocket, counter));
-            }
+
+    public static class closingResources extends Thread{
+        ExecutorService pool;
+
+        public closingResources(){
+            pool = Executors.newCachedThreadPool();
+        }
+
+        public ExecutorService getPool(){
+            return pool;
+        }
+
+        @Override
+        public void run(){
             pool.shutdown();
-            System.out.println("Closing server ... ");
+            System.out.println("Server closed.");
+        }
+    }
+    public static void main(String[] args) {
+        closingResources cR=new closingResources();
+        Runtime.getRuntime().addShutdownHook(cR);
+        ExecutorService pool = cR.getPool();
+        try (ServerSocket welcomingSocket = new ServerSocket(5757)) {
+            System.out.println("Server opened.");
+            while (true) {
+                Socket connectionSocket = welcomingSocket.accept();
+                System.out.println("client accepted!");
+                pool.execute(new ClientHandler(connectionSocket));
+            }
+            
         } catch (IOException ex) {
             System.err.println(ex);
         }
-        System.out.println("done.");
     }
 }
-
-// add condition for exiting the loop and closing the server
+// add config file

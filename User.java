@@ -1,4 +1,6 @@
-public class User{
+import java.io.Serializable;
+
+public class User implements Serializable{
     private String userName;
     private String firstName;
     private String lastName;

@@ -1,9 +1,15 @@
-public class Tweet{
-    protected int likesCount;
-    protected int reTweetsCount;
-    protected int commentsCount;
-    protected String tweetDate;
-    protected String hashTag;
+import java.awt.image.BufferedImage;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Tweet implements Serializable{
+    private int likesCount;
+    private int reTweetsCount;
+    private int commentsCount;
+    private String tweetDate;
+    private String hashTag;
+    private String message;
+    private ArrayList<BufferedImage> images;
 
     public Tweet(String tweetDate, String hashTag) {
         this.likesCount = 0;
@@ -29,6 +35,3 @@ public class Tweet{
         this.hashTag = hashTag;
     }
 }
-// add imageTweet later
-// add combinedTweet
-// imageTweet multiple images

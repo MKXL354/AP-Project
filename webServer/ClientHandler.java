@@ -1,32 +1,38 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
 class ClientHandler implements Runnable {
 
     private Socket connectionSocket;
-    private int clientNum;
 
-    public ClientHandler(Socket connectionSocket, int clientNum) {
+    public ClientHandler(Socket connectionSocket) {
         this.connectionSocket = connectionSocket;
-        this.clientNum=clientNum;
     }
 
     @Override
     public void run() {
+        DataObject dataObject;
+        DataManager dataManager;
+
         try {
             OutputStream out = connectionSocket.getOutputStream();
+            ObjectOutputStream outObj=new ObjectOutputStream(out);
             InputStream in = connectionSocket.getInputStream();
-            byte[] buffer = new byte[2048];
-            String[] messages = {"salam", "khubam!", "salamati!"};
-            for (String msg: messages) {
-                int read = in.read(buffer);
-                System.out.println("RECV from "+clientNum+": " + new String(buffer, 0, read));
-                out.write(msg.getBytes());
-                System.out.println("SENT to "+clientNum+": " + msg);
+            ObjectInputStream inObj=new ObjectInputStream(in);
+            while(true){
+                dataObject=(DataObject)inObj.readObject();
+                dataManager=new DataManager(dataObject);
+                dataObject=dataManager.response();
+                outObj.writeObject(dataObject);
             }
+
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -37,4 +43,3 @@ class ClientHandler implements Runnable {
         }
     }
 }
-// needs to be heavily modified
