@@ -12,6 +12,9 @@ public class User implements Serializable{
     private String bio;
     private String location;
     private String webSiteAddress;
+
+    private String signUpDate;
+    private String lastModified;
     // add Avatar and Header
 
     public User(String userName, String firstName, String lastName, String email, String phoneNumber, String passWord, String country, String birthDate){
