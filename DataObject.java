@@ -1,4 +1,6 @@
-public class DataObject {
+import java.io.Serializable;
+
+public class DataObject implements Serializable{
     private String method;
     private Object object;
 

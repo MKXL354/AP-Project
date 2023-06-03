@@ -4,6 +4,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.mysql.cj.callback.UsernameCallback;
+
 public class ClientApp{
 
     public boolean checkData(String regex, String data){
@@ -58,17 +60,24 @@ public class ClientApp{
         return(checkData(regex, passWord));
     }
 
-    public void signUp(){
-        String userName;
+    public boolean repeatPassWord(String passWord, Scanner scanner){
+        String newPass=scanner.nextLine();
+        if(newPass.equals(passWord)){
+            return true;
+        } 
+        return false;
+    }
+
+    public void signUp(DataThread dataThread, Scanner scanner){
+        String userName="null";
         String firstName;
         String lastName;
-        String email;
-        String phoneNumber;
+        String email="null";
+        String phoneNumber="null";
         String passWord;
         String country;
         String birthDate;
 
-        Scanner scanner=new Scanner(System.in);
         System.out.println("enter first name: ");
         firstName=scanner.nextLine();
 
@@ -94,10 +103,12 @@ public class ClientApp{
         }
 
         while(true){
-            System.out.println("Do you want to use only email? y/n");
-            String choice=scanner.nextLine();
-            if(choice.equals("y")){
-                break;
+            if(!email.equals("null")){
+                System.out.println("Do you want to use only email? y/n");
+                String choice=scanner.nextLine();
+                if(choice.equals("y")){
+                    break;
+                }
             }
             else{
                 System.out.println("enter phone number: ");
@@ -134,9 +145,17 @@ public class ClientApp{
             }
         }
 
-        System.out.println("enter username: ");
-        userName=scanner.nextLine();
-
+        while(true){
+            System.out.println("enter username: ");
+            userName=scanner.nextLine();
+            if(userName.equals("null")){
+                System.out.println("cannot be empty");
+            }
+            else{
+                break;
+            }
+        }
+        
         while(true){
             System.out.println("enter password: ");
             passWord=scanner.nextLine();
@@ -144,10 +163,24 @@ public class ClientApp{
                 System.out.println("wrong format");
             }
             else{
+                while(true){
+                    System.out.println("repeat password: ");
+                    if(!repeatPassWord(passWord, scanner)){
+                        System.out.println("repeat the correct password");
+                    }
+                    else{
+                        break;
+                    }
+                }
                 break;
             }
         }
-        scanner.close();
+        User user=new User(userName, firstName, lastName, email, phoneNumber, passWord, country, birthDate);
+        DataObject dataObject=new DataObject("sign-up", user);
+        dataThread.setData(dataObject);
+        synchronized(dataThread){
+            dataThread.notify();
+        }
     }
 
     public void signIn(){
@@ -155,21 +188,23 @@ public class ClientApp{
     }
 
     public static void main(String[] args){
+        DataThread dataThread=new DataThread();
+        dataThread.start();
         ClientApp CA=new ClientApp();
         Scanner scanner=new Scanner(System.in);
-        int choice;
+        String choice;
         while(true){
             System.out.println("1:sign in\n2:sign up\n3:exit");
-            choice=scanner.nextInt();
-            if(choice==1){
+            choice=scanner.nextLine();
+            if(choice.equals("1")){
                 CA.signIn();
             }
-            else if(choice==2){
-                CA.signUp();
+            else if(choice.equals("2")){
+                CA.signUp(dataThread, scanner);
             }
-            else if(choice==3){
+            else if(choice.equals("3")){
                 scanner.close();
-                return;
+                System.exit(0);
             }
             else{
                 continue;
@@ -177,3 +212,6 @@ public class ClientApp{
         }
     }
 }
+// handle invalid requests
+// handle incomplete data transfers
+// implement database

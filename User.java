@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.awt.image.BufferedImage;
 
 public class User implements Serializable{
     private String userName;
@@ -12,10 +13,10 @@ public class User implements Serializable{
     private String bio;
     private String location;
     private String webSiteAddress;
-
     private String signUpDate;
     private String lastModified;
-    // add Avatar and Header
+    private BufferedImage avatar;
+    private BufferedImage header;
 
     public User(String userName, String firstName, String lastName, String email, String phoneNumber, String passWord, String country, String birthDate){
         this.userName=userName;
@@ -39,5 +40,12 @@ public class User implements Serializable{
     public void setWebSiteAddress(String webSiteAddress){
         this.webSiteAddress=webSiteAddress;
     }
+
+    public void setAvatar(BufferedImage avatar){
+        this.avatar=avatar;
+    }
     
+    public void setHeader(BufferedImage header){
+        this.header=header;
+    }
 }
